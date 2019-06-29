@@ -50,7 +50,6 @@ RUN DIR=$(mktemp -d) && cd ${DIR} && \
     curl -sL "https://www.nasm.us/pub/nasm/releasebuilds/${NASM_VERSION}/nasm-${NASM_VERSION}.tar.bz2" | \
     tar -jx --strip-components=1 && \
     ./autogen.sh && \
-#    ./configure --prefix="${SRC_DIR}/build" --bindir="${SRC_DIR}/bin" && \
     ./configure --prefix="/usr" --libdir="/usr/lib64" && \
     make && make install && \
     rm -rf ${DIR}
@@ -98,6 +97,16 @@ RUN DIR=$(mktemp -d) && cd ${DIR} && \
     make && make install && \
     rm -rf ${DIR}
 
+# Build libbluray
+RUN yum install -y libxml2-devel fontconfig fontconfig-devel ant && yum clean all
+ARG LIBBLURAY_VERSION=1.1.2
+RUN DIR=$(mktemp -d) && cd ${DIR} && \
+    curl -sL https://download.videolan.org/pub/videolan/libbluray/${LIBBLURAY_VERSION}/libbluray-${LIBBLURAY_VERSION}.tar.bz2 | \
+    tar -jx --strip-components=1 && \
+    ./configure --prefix=/usr --libdir=/usr/lib64 && \
+    make && make install && \
+    rm -rf ${DIR}
+
 # Build ffmpeg
 ARG TARGET_VERSION=snapshot
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
@@ -116,6 +125,7 @@ RUN DIR=$(mktemp -d) && cd ${DIR} && \
         --enable-libx265 \
         --enable-libx264 \
         --enable-vaapi \
+        --enable-libbluray \
         --enable-libfdk_aac --enable-nonfree \
         --enable-libvpx \
         --disable-doc \
