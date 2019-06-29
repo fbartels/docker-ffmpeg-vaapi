@@ -3,21 +3,28 @@ language: minimal
 services:
   - docker
 
+env:
+  global:
+    - DOCKER_CACHE_ARGS=""
+    - IMAGE_LABEL=${TRAVIS_BRANCH}
+
 before_install:
   - sudo sed -i "s/\DOCKER_OPTS=\"/DOCKER_OPTS=\"--insecure-registry=${DOCKER_REGISTRY} /g" /etc/default/docker
   - sudo service docker restart
 
 install:
-  - docker pull ${DOCKER_REGISTRY}/ffmpeg:latest || true
+  - if [[ "master" != "${TRAVIS_BRANCH}" ]]; then
+                DOCKER_CACHE_ARGS="--cache-from ${DOCKER_REGISTRY}/ffmpeg:latest";
+                docker pull ${DOCKER_REGISTRY}/ffmpeg:latest || true;
+        fi
 
 script:
-  - set -e
-  - docker build --cache-from ${DOCKER_REGISTRY}/ffmpeg:latest --tag ${DOCKER_REGISTRY}/ffmpeg:${TRAVIS_BRANCH} .
-  - docker run --rm -t ${DOCKER_REGISTRY}/ffmpeg:${TRAVIS_BRANCH} -buildconf
+  - docker build --compress ${DOCKER_CACHE_ARGS} --tag ffmpeg:latest .
+  - docker run --rm -t ffmpeg:latest -buildconf
 
 after_success:
-  - LABEL=${TRAVIS_BRANCH}
-  - if [[ "master" == "${TRAVIS_BRANCH}" ]]; then LABEL="lastest"; fi
-  - echo "Pushing to {DOCKER_REGISTRY}"
-  - docker push ${DOCKER_REGISTRY}/ffmpeg:${LABEL}
+  - if [[ "master" == "${TRAVIS_BRANCH}" ]]; then IMAGE_LABEL="latest"; fi
+  - echo "Pushing to ${DOCKER_REGISTRY} with label ${IMAGE_LABEL}"
+  - docker tag ffmpeg:latest ${DOCKER_REGISTRY}/ffmpeg:${IMAGE_LABEL}
+  - docker push ${DOCKER_REGISTRY}/ffmpeg:${IMAGE_LABEL}
 
