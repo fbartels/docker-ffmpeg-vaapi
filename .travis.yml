@@ -19,6 +19,7 @@ install:
         fi
 
 script:
+  - set -e
   - docker build --compress ${DOCKER_CACHE_ARGS} --tag ffmpeg:latest .
   - docker run --rm -t ffmpeg:latest -buildconf
 
