@@ -1,13 +1,23 @@
 language: minimal
 
+services:
+  - docker
+
+before_install:
+  - sudo sed -i "s/\DOCKER_OPTS=\"/DOCKER_OPTS=\"--insecure-registry=${DOCKER_REGISTRY} /g" /etc/default/docker
+  - sudo service docker restart
+
+install:
+  - docker pull ${DOCKER_REGISTRY}/ffmpeg:latest || true
+
 script:
   - set -e
-  - docker build --tag ffmpeg:${TRAVIS_BRANCH} .
-  - docker run --rm -t ffmpeg:${TRAVIS_BRANCH} -buildconf
+  - docker build --cache-from ${DOCKER_REGISTRY}/ffmpeg:latest --tag ${DOCKER_REGISTRY}/ffmpeg:${TRAVIS_BRANCH} .
+  - docker run --rm -t ${DOCKER_REGISTRY}/ffmpeg:${TRAVIS_BRANCH} -buildconf
 
-deploy:
-  on:
-    tags: true
-  script:
-    - echo "Deploying ${TRAVIS_BRANCH}"
+after_success:
+  - LABEL=${TRAVIS_BRANCH}
+  - if [[ "master" == "${TRAVIS_BRANCH}" ]]; then LABEL="lastest"; fi
+  - echo "Pushing to {DOCKER_REGISTRY}"
+  - docker push ${DOCKER_REGISTRY}/ffmpeg:${LABEL}
 

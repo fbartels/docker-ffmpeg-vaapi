@@ -3,12 +3,17 @@
 FROM centos
 MAINTAINER SuperFlyXXI <superflyxxi@yahoo.com>
 
-ARG SRC_DIR=/ffmpeg
-
-CMD ["--help"]
 ENTRYPOINT ["ffmpeg"]
+CMD ["--help"]
 
 ARG PKG_CONFIG_PATH=/usr/lib/pkgconfig
+ARG LIBDRM_VERSION=2.4.91
+ARG LIBVA_VERSION=1.8.1
+ARG FFMPEG_VERSION=snapshot
+ARG NASM_VERSION=2.14.02
+ARG YASM_VERSION=1.3.0
+ARG SRC_DIR=/ffmpeg
+
 ENV PATH=${PATH}:${SRC_DIR}/bin
 
 WORKDIR ${SRC_DIR}
@@ -21,14 +26,12 @@ RUN yum install -y --enablerepo=extras epel-release yum-utils && yum clean all
 RUN yum upgrade -y && yum clean all
 
 # Install libdrm
-ARG LIBDRM_VERSION=2.4.91
 RUN yum install -y libdrm-${LIBDRM_VERSION} libdrm-devel-${LIBDRM_VERSION} && yum clean all
 
 # Install build dependencies
 RUN yum install -y automake autoconf bzip2 bzip2-devel cmake freetype-devel gcc gcc-c++ git libtool make mercurial nasm yasm zlib-devel && yum clean all
 
 # Build libva
-ARG LIBVA_VERSION=1.8.1
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
     curl -sL https://www.freedesktop.org/software/vaapi/releases/libva/libva-${LIBVA_VERSION}.tar.bz2 | \
     tar -jx --strip-components=1 && \
@@ -45,7 +48,6 @@ RUN DIR=$(mktemp -d) && cd ${DIR} && \
     rm -rf ${DIR}
 
 # Build nasm
-ARG NASM_VERSION=2.14.02
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
     curl -sL "https://www.nasm.us/pub/nasm/releasebuilds/${NASM_VERSION}/nasm-${NASM_VERSION}.tar.bz2" | \
     tar -jx --strip-components=1 && \
@@ -55,7 +57,6 @@ RUN DIR=$(mktemp -d) && cd ${DIR} && \
     rm -rf ${DIR}
 
 # Build yasm
-ARG YASM_VERSION=1.3.0
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
     curl -sL "https://www.tortall.net/projects/yasm/releases/yasm-${YASM_VERSION}.tar.gz" | \
     tar -zx --strip-components=1 && \
@@ -108,9 +109,8 @@ RUN DIR=$(mktemp -d) && cd ${DIR} && \
     rm -rf ${DIR}
 
 # Build ffmpeg
-ARG TARGET_VERSION=snapshot
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    curl -sL http://ffmpeg.org/releases/ffmpeg-${TARGET_VERSION}.tar.bz2 | \
+    curl -sL http://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.bz2 | \
     tar -jx --strip-components=1 && \
     PATH="${SRC_DIR}/bin:$PATH" PKG_CONFIG_PATH="${SRC_DIR}/build/lib/pkgconfig" ./configure \
         --prefix="${SRC_DIR}/build" \
