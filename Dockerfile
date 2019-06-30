@@ -7,12 +7,9 @@ ENTRYPOINT ["ffmpeg"]
 CMD ["--help"]
 
 ARG PKG_CONFIG_PATH=/usr/lib/pkgconfig
-ARG LIBDRM_VERSION=2.4.91
-ARG LIBVA_VERSION=1.8.1
-ARG FFMPEG_VERSION=snapshot
-ARG NASM_VERSION=2.14.02
-ARG YASM_VERSION=1.3.0
 ARG SRC_DIR=/ffmpeg
+ARG LIBDRM_VERSION=2.4.91
+ARG NASM_VERSION=2.14.02
 
 ENV PATH=${PATH}:${SRC_DIR}/bin
 
@@ -28,21 +25,30 @@ RUN yum upgrade -y && yum clean all
 # Install libdrm
 RUN yum install -y libdrm-${LIBDRM_VERSION} libdrm-devel-${LIBDRM_VERSION} && yum clean all
 
-# Install build dependencies
-RUN yum install -y automake autoconf bzip2 bzip2-devel cmake freetype-devel gcc gcc-c++ git libtool make mercurial nasm yasm zlib-devel && yum clean all
+# Install compile dependencies
+RUN yum install -y \
+    # Common Dependencies
+    automake autoconf bzip2 bzip2-devel cmake freetype-devel gcc gcc-c++ git libtool make mercurial zlib-devel \
+    # libva dependencies
+    which \
+    # libbluray dependencies
+    libxml2-devel fontconfig fontconfig-devel ant \
+    && yum clean all
 
 # Build libva
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    curl -sL https://www.freedesktop.org/software/vaapi/releases/libva/libva-${LIBVA_VERSION}.tar.bz2 | \
-    tar -jx --strip-components=1 && \
+    git clone --depth 1 https://github.com/intel/libva.git && \
+    cd libva && \
+    ./autogen.sh && \
     ./configure CFLAGS=' -O2' CXXFLAGS=' -O2' --prefix=/usr --libdir=/usr/lib64 && \
     make && make install && \
     rm -rf ${DIR}
 
 # Build libva-intel-driver
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    curl -sL https://www.freedesktop.org/software/vaapi/releases/libva-intel-driver/intel-vaapi-driver-${LIBVA_VERSION}.tar.bz2 | \
-    tar -jx --strip-components=1 && \
+    git clone --depth 1 https://github.com/intel/intel-vaapi-driver.git && \
+    cd intel-vaapi-driver && \
+    ./autogen.sh && \
     ./configure && \
     make && make install && \
     rm -rf ${DIR}
@@ -58,9 +64,9 @@ RUN DIR=$(mktemp -d) && cd ${DIR} && \
 
 # Build yasm
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    curl -sL "https://www.tortall.net/projects/yasm/releases/yasm-${YASM_VERSION}.tar.gz" | \
-    tar -zx --strip-components=1 && \
-    #./configure --prefix="${SRC_DIR}/build" --bindir="${SRC_DIR}/bin" && \
+    git clone --depth 1  https://github.com/yasm/yasm.git && \
+    cd yasm && \
+    ./autogen.sh && \
     ./configure --prefix="/usr" --libdir="/usr/lib64" && \
     make && make install && \
     rm -rf ${DIR}
@@ -99,20 +105,20 @@ RUN DIR=$(mktemp -d) && cd ${DIR} && \
     rm -rf ${DIR}
 
 # Build libbluray
-RUN yum install -y libxml2-devel fontconfig fontconfig-devel ant && yum clean all
-ARG LIBBLURAY_VERSION=1.1.2
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    curl -sL https://download.videolan.org/pub/videolan/libbluray/${LIBBLURAY_VERSION}/libbluray-${LIBBLURAY_VERSION}.tar.bz2 | \
-    tar -jx --strip-components=1 && \
+    git clone --depth 1 https://code.videolan.org/videolan/libbluray.git && \
+    cd libbluray && \
+    git submodule update --init && \
+    ./bootstrap && \
     ./configure --prefix=/usr --libdir=/usr/lib64 && \
     make && make install && \
     rm -rf ${DIR}
 
 # Build ffmpeg
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    curl -sL http://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.bz2 | \
-    tar -jx --strip-components=1 && \
-    PATH="${SRC_DIR}/bin:$PATH" PKG_CONFIG_PATH="${SRC_DIR}/build/lib/pkgconfig" ./configure \
+    git clone --depth 1 https://git.ffmpeg.org/ffmpeg.git && \
+    cd ffmpeg && \
+    PKG_CONFIG_PATH="${SRC_DIR}/build/lib/pkgconfig" ./configure \
         --prefix="${SRC_DIR}/build" \
         --pkg-config-flags="--static" \
         --extra-cflags="-I${SRC_DIR}/build/include" \
