@@ -1,5 +1,8 @@
 #!/bin/bash
 
+IMAGE_NAME=${IMAGE_NAME:-ffmpeg-vaapi}
+IMAGE_LABEL=${IMAGE_LABEL:-build}
+
 VAAPI_ENABLED=${VAAPI_ENABLED:-false}
 FFMPEG_X264="libx264"
 FFMPEG_X265="libx265"
@@ -41,7 +44,7 @@ function runTest() {
 		docker run -d --name ${TEST_NAME} \
 			${VAAPI_DOCKER_ARGS} \
 			-v ${DIR}/${TEST_NAME}:/data \
-			ffmpeg:build \
+			${IMAGE_NAME}:${IMAGE_LABEL} \
 			${VAAPI_FFMPEG_ARGS} \
 			-i ${TEST_FILE} \
 			${FFMPEG_ARGS} \

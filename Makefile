@@ -2,5 +2,6 @@
 
 .PHONY: container
 container:
-	docker build -t pocka/ffmpeg-vaapi .
+	docker build -t ffmpeg-vaapi:build .
+	bash runtests.sh
 
