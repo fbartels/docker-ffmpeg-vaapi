@@ -11,6 +11,7 @@ env:
 before_install:
   - sudo sed -i "s/\DOCKER_OPTS=\"/DOCKER_OPTS=\"--insecure-registry=${DOCKER_REGISTRY} /g" /etc/default/docker
   - sudo service docker restart
+  - echo ${DOCKER_REGISTRY_PASSWORD} | docker login --username ${DOCKER_REGISTRY_USERNAME} --password-stdin ${DOCKER_REGISTRY}
 
 install:
   - if [[ "master" != "${TRAVIS_BRANCH}" ]]; then
