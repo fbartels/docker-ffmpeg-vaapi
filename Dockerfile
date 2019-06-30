@@ -16,7 +16,7 @@ ARG SRC_DIR=/ffmpeg
 
 ENV PATH=${PATH}:${SRC_DIR}/bin
 
-WORKDIR ${SRC_DIR}
+WORKDIR /data
 RUN mkdir -p ${SRC_DIR}/build ${SRC_DIR}/bin
 
 # Enable repos

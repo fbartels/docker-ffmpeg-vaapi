@@ -9,6 +9,7 @@ env:
     - IMAGE_LABEL=${TRAVIS_BRANCH}
 
 before_install:
+  - sudo apt-get install -y jq
   - sudo sed -i "s/\DOCKER_OPTS=\"/DOCKER_OPTS=\"--insecure-registry=${DOCKER_REGISTRY} /g" /etc/default/docker
   - sudo service docker restart
   - echo ${DOCKER_REGISTRY_PASSWORD} | docker login --username ${DOCKER_REGISTRY_USERNAME} --password-stdin ${DOCKER_REGISTRY}
@@ -21,12 +22,13 @@ install:
 
 script:
   - set -e
-  - docker build --compress ${DOCKER_CACHE_ARGS} --tag ffmpeg:latest .
-  - docker run --rm -t ffmpeg:latest -buildconf
+  - docker build --compress ${DOCKER_CACHE_ARGS} --tag ffmpeg:build .
+  - docker run --rm -t ffmpeg:build -buildconf
+  - bash runtests.sh
 
 after_success:
   - if [[ "master" == "${TRAVIS_BRANCH}" ]]; then IMAGE_LABEL="latest"; fi
   - echo "Pushing to ${DOCKER_REGISTRY} with label ${IMAGE_LABEL}"
-  - docker tag ffmpeg:latest ${DOCKER_REGISTRY}/ffmpeg:${IMAGE_LABEL}
+  - docker tag ffmpeg:build ${DOCKER_REGISTRY}/ffmpeg:${IMAGE_LABEL}
   - docker push ${DOCKER_REGISTRY}/ffmpeg:${IMAGE_LABEL}
 
