@@ -8,7 +8,6 @@ CMD ["--help"]
 
 ARG PKG_CONFIG_PATH=/usr/lib/pkgconfig
 ARG SRC_DIR=/ffmpeg
-ARG LIBDRM_VERSION=2.4.91
 ARG NASM_VERSION=2.14.02
 
 ENV PATH=${PATH}:${SRC_DIR}/bin
@@ -23,7 +22,7 @@ RUN yum install -y --enablerepo=extras epel-release yum-utils && yum clean all
 RUN yum upgrade -y && yum clean all
 
 # Install libdrm
-RUN yum install -y libdrm-${LIBDRM_VERSION} libdrm-devel-${LIBDRM_VERSION} && yum clean all
+RUN yum install -y libdrm libdrm-devel && yum clean all
 
 # Install compile dependencies
 RUN yum install -y \
