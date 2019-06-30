@@ -24,8 +24,7 @@ Convert MPEG2-TS(`input.ts`) to MP4(H.264)(`output.mp4`) and scale it to 1280x72
 
 ```shell
 docker run \
-  --privileged \
-  -v /dev/dri:/dev/dri \
+  --device /dev/dri:/dev/dri \
   -v `pwd`:/data \
   pocka/ffmpeg-vaapi \
     -vaapi_device /dev/dri/renderD128 \
