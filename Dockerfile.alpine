@@ -1,0 +1,56 @@
+FROM alpine
+MAINTAINER SuperFlyXXI <superflyxxi@yahoo.com>
+
+ENTRYPOINT ["ffmpeg"]
+CMD ["--help"]
+
+WORKDIR /data
+
+# Build libva
+RUN apk add --no-cache libva libva-dev
+
+# Build libva-intel-driver
+RUN apk add --no-cache libva-intel-driver
+
+# Build yasm
+RUN apk add --no-cache yasm
+
+# Build x264
+RUN apk add --no-cache x264 x264-dev
+
+# Build x265
+RUN apk add --no-cache x265 x265-dev
+
+# Build fdk_aac
+RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ fdk-aac-dev
+
+# Build libvpx
+RUN apk add --no-cache libvpx libvpx-dev
+
+# Build libbluray
+RUN apk add --no-cache libbluray libbluray-dev
+
+# ffmpeg build dependencies
+RUN apk --no-cache add git pkgconf make gcc musl-dev
+
+# Build ffmpeg
+RUN DIR=$(mktemp -d) && cd ${DIR} && \
+    git clone --depth 1 https://git.ffmpeg.org/ffmpeg.git && cd ffmpeg && \
+    ./configure \
+        --extra-libs=-lpthread \
+        --extra-libs=-lm \
+        --enable-small \
+        --enable-gpl \
+        --enable-libx265 \
+        --enable-libx264 \
+        --enable-vaapi \
+        --enable-libbluray \
+        --enable-libfdk_aac --enable-nonfree \
+        --enable-libvpx \
+        --disable-doc \
+        --disable-debug && \
+    make && make install && \
+    make distclean && \
+    hash -r && \
+    rm -rf ${DIR} 
+

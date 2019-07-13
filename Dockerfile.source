@@ -1,0 +1,172 @@
+FROM alpine
+MAINTAINER SuperFlyXXI <superflyxxi@yahoo.com>
+
+ENTRYPOINT ["ffmpeg"]
+CMD ["--help"]
+
+ARG PKG_CONFIG_PATH=/usr/lib/pkgconfig
+ARG SRC_DIR=/ffmpeg
+ARG NASM_VERSION=2.14.02
+
+ENV PATH=${PATH}:${SRC_DIR}/bin
+
+WORKDIR /data
+RUN mkdir -p ${SRC_DIR}/build ${SRC_DIR}/bin
+
+# Enable repos
+#RUN yum install -y --enablerepo=extras epel-release yum-utils && yum clean all
+
+# Upgrade OS
+#RUN yum upgrade -y && yum clean all
+
+# Install libdrm
+#RUN yum install -y libdrm libdrm-devel && yum clean all
+
+# Install compile dependencies
+#RUN yum install -y \
+    # Common Dependencies
+#    automake autoconf bzip2 bzip2-devel cmake freetype-devel gcc gcc-c++ git libtool make mercurial zlib-devel \
+    # libva dependencies
+#    which \
+    # libbluray dependencies
+#    libxml2-devel fontconfig fontconfig-devel ant \
+#    && yum clean all
+
+RUN apk add gcc git musl-dev ninja meson pkgconf autoconf make automake
+
+ARG DIR=/tmp/build
+RUN mkdir -p ${DIR}
+
+# Build xorgs-macros
+RUN cd ${DIR} && \
+	git clone --depth 1 https://github.com/freedesktop/xorg-macros.git
+RUN cd ${DIR}/xorg-macros && \
+	./autogen.sh && \
+	./configure && \
+	make && \
+	make install
+
+# Build PCI-Access
+RUN cd ${DIR} && \
+	git clone --depth 1 https://gitlab.freedesktop.org/xorg/lib/libpciaccess
+RUN cd ${DIR}/libpciaccess && \
+	./autogen.sh && \
+	./configure && \
+	make && \
+	make install
+
+# Build libdrm
+RUN cd ${DIR} && \
+	git clone --depth 1 https://gitlab.freedesktop.org/mesa/drm
+RUN cd ${DIR}/drm && \
+	mkdir -p build && cd build && \
+	meson -Dudev=true && \
+	ninja test && \
+	ninja
+
+# Build libva
+RUN DIR=$(mktemp -d) && cd ${DIR} && \
+    git clone --depth 1 https://github.com/intel/libva.git && \
+    cd libva && \
+    ./autogen.sh && \
+    ./configure CFLAGS=' -O2' CXXFLAGS=' -O2' --prefix=/usr --libdir=/usr/lib64 && \
+    make && make install && \
+    rm -rf ${DIR}
+
+# Build libva-intel-driver
+RUN DIR=$(mktemp -d) && cd ${DIR} && \
+    git clone --depth 1 https://github.com/intel/intel-vaapi-driver.git && \
+    cd intel-vaapi-driver && \
+    ./autogen.sh && \
+    ./configure && \
+    make && make install && \
+    rm -rf ${DIR}
+
+# Build nasm
+RUN DIR=$(mktemp -d) && cd ${DIR} && \
+    curl -sL "https://www.nasm.us/pub/nasm/releasebuilds/${NASM_VERSION}/nasm-${NASM_VERSION}.tar.bz2" | \
+    tar -jx --strip-components=1 && \
+    ./autogen.sh && \
+    ./configure --prefix="/usr" --libdir="/usr/lib64" && \
+    make && make install && \
+    rm -rf ${DIR}
+
+# Build yasm
+RUN DIR=$(mktemp -d) && cd ${DIR} && \
+    git clone --depth 1  https://github.com/yasm/yasm.git && \
+    cd yasm && \
+    ./autogen.sh && \
+    ./configure --prefix="/usr" --libdir="/usr/lib64" && \
+    make && make install && \
+    rm -rf ${DIR}
+
+# Build x264
+RUN DIR=$(mktemp -d) && cd ${DIR} && \
+    git clone --depth 1 https://code.videolan.org/videolan/x264.git && \
+    cd x264 && \
+    PKG_CONFIG_PATH="${SRC_DIR}/build/lib/pkgconfig" ./configure --prefix="${SRC_DIR}/build" --bindir="${SRC_DIR}/bin" --enable-static && \
+    make && make install && \
+    rm -rf ${DIR}
+
+# Build x265
+RUN DIR=$(mktemp -d) && cd ${DIR} && \
+    hg clone https://bitbucket.org/multicoreware/x265 && \
+    cd x265/build/linux && \
+     cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="${SRC_DIR}/build" -DENABLE_SHARED:bool=off ../../source && \
+    make && make install && \
+    rm -rf ${DIR}
+
+# Build fdk_aac
+RUN DIR=$(mktemp -d) && cd ${DIR} && \
+    git clone --depth 1 https://github.com/mstorsjo/fdk-aac && \
+    cd fdk-aac && \
+    autoreconf -fiv && \
+    ./configure --prefix="${SRC_DIR}/build" --disable-shared && \
+    make && make install && \
+    rm -rf ${DIR}
+
+# Build libvpx
+RUN DIR=$(mktemp -d) && cd ${DIR} && \
+    git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git && \
+    cd libvpx && \
+    ./configure --prefix="${SRC_DIR}/build" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm && \
+    make && make install && \
+    rm -rf ${DIR}
+
+# Build libbluray
+RUN DIR=$(mktemp -d) && cd ${DIR} && \
+    git clone --depth 1 https://code.videolan.org/videolan/libbluray.git && \
+    cd libbluray && \
+    git submodule update --init && \
+    ./bootstrap && \
+    ./configure --prefix=/usr --libdir=/usr/lib64 && \
+    make && make install && \
+    rm -rf ${DIR}
+
+# Build ffmpeg
+RUN DIR=$(mktemp -d) && cd ${DIR} && \
+    git clone --depth 1 https://git.ffmpeg.org/ffmpeg.git && \
+    cd ffmpeg && \
+    PKG_CONFIG_PATH="${SRC_DIR}/build/lib/pkgconfig" ./configure \
+        --prefix="${SRC_DIR}/build" \
+        --pkg-config-flags="--static" \
+        --extra-cflags="-I${SRC_DIR}/build/include" \
+        --extra-ldflags="-L${SRC_DIR}/build/lib" \
+        --extra-libs=-lpthread \
+        --extra-libs=-lm \
+        --bindir="${SRC_DIR}/bin" \
+        --enable-small \
+        --enable-gpl \
+        --enable-libx265 \
+        --enable-libx264 \
+        --enable-vaapi \
+        --enable-libbluray \
+        --enable-libfdk_aac --enable-nonfree \
+        --enable-libvpx \
+        --disable-doc \
+        --disable-debug && \
+    make && make install && \
+    make distclean && \
+    hash -r && \
+    rm -rf ${DIR} 
+
