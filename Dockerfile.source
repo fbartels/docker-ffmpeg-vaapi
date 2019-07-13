@@ -4,14 +4,14 @@ MAINTAINER SuperFlyXXI <superflyxxi@yahoo.com>
 ENTRYPOINT ["ffmpeg"]
 CMD ["--help"]
 
-ARG PKG_CONFIG_PATH=/usr/lib/pkgconfig
-ARG SRC_DIR=/ffmpeg
-ARG NASM_VERSION=2.14.02
+#ARG PKG_CONFIG_PATH=/usr/lib/pkgconfig
+#ARG SRC_DIR=/ffmpeg
+#ARG NASM_VERSION=2.14.02
 
-ENV PATH=${PATH}:${SRC_DIR}/bin
+#ENV PATH=${PATH}:${SRC_DIR}/bin
 
 WORKDIR /data
-RUN mkdir -p ${SRC_DIR}/build ${SRC_DIR}/bin
+#RUN mkdir -p ${SRC_DIR}/build ${SRC_DIR}/bin
 
 # Enable repos
 #RUN yum install -y --enablerepo=extras epel-release yum-utils && yum clean all
@@ -32,24 +32,28 @@ RUN mkdir -p ${SRC_DIR}/build ${SRC_DIR}/bin
 #    libxml2-devel fontconfig fontconfig-devel ant \
 #    && yum clean all
 
-RUN apk add gcc git musl-dev ninja meson pkgconf autoconf make automake
+#RUN apk add gcc git musl-dev ninja meson pkgconf autoconf make automake
 
-ARG DIR=/tmp/build
-RUN mkdir -p ${DIR}
+ARG TMP_DIR=/tmp/build
+RUN mkdir -p ${TMP_DIR}
 
 # Build xorgs-macros
-RUN cd ${DIR} && \
-	git clone --depth 1 https://github.com/freedesktop/xorg-macros.git
-RUN cd ${DIR}/xorg-macros && \
+RUN PACKAGES="git musl-dev gcc autoconf automake make" && \
+	apk add --no-cache ${PACKAGES} && \
+	DIR=$(mktemp -d) && cd ${DIR} && \
+	git clone --depth 1 https://github.com/freedesktop/xorg-macros.git && \
+	cd xorg-macros && \
 	./autogen.sh && \
 	./configure && \
 	make && \
-	make install
+	make install && \
+	apk del ${PACKAGES} && \
+	rm -rf ${DIR}
 
 # Build PCI-Access
-RUN cd ${DIR} && \
+RUN cd ${TMP_DIR} && \
 	git clone --depth 1 https://gitlab.freedesktop.org/xorg/lib/libpciaccess
-RUN cd ${DIR}/libpciaccess && \
+RUN cd ${TMP_DIR}/libpciaccess && \
 	./autogen.sh && \
 	./configure && \
 	make && \
