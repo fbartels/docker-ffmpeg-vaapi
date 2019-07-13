@@ -36,11 +36,12 @@ after_success:
     else
       export PUSH_IMAGE="${FINAL_IMAGE}:${OS}-${TRAVIS_BRANCH}";
     fi
-  - echo "Pushing to ${FINAL_IMAGE}"
+  - echo "Pushing to ${PUSH_IMAGE}"
   - docker tag ${IMAGE_NAME}:build ${PUSH_IMAGE}
   - docker push ${PUSH_IMAGE}
   - if [[ "master" == "${TRAVIS_BRANCH}" && "${OS}" == "centos" ]]; then
       docker tag ${IMAGE_NAME}:build ${FINAL_IMAGE}:latest;
+      echo "Pushing to ${FINAL_IMAGE}:latest";
       docker push ${FINAL_IMAGE}:latest;
     fi
 
