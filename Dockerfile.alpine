@@ -6,6 +6,9 @@ CMD ["--help"]
 
 WORKDIR /data
 
+# Upgrade the OS
+RUN apk update --no-cache
+
 # Build libva
 RUN apk add --no-cache libva libva-dev
 
