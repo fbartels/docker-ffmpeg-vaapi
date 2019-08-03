@@ -75,13 +75,16 @@ RUN apk add --no-cache libdrm-dev
 #	apk del ${APK_ARGS}
 
 # Build libva
-RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    git clone --depth 1 https://github.com/intel/libva.git && \
-    cd libva && \
-    ./autogen.sh && \
-    ./configure CFLAGS=' -O2' CXXFLAGS=' -O2' --prefix=/usr --libdir=/usr/lib64 && \
-    make && make install && \
-    rm -rf ${DIR}
+RUN APK_ARGS="git musl-dev gcc autoconf automake libtool make" && \
+	apk add --no-cache ${APK_ARGS} && \
+	DIR=$(mktemp -d) && cd ${DIR} && \
+	git clone --depth 1 https://github.com/intel/libva.git && \
+	cd libva && \
+	./autogen.sh && \
+	./configure CFLAGS=' -O2' CXXFLAGS=' -O2' --prefix=${PREFIX} && \
+	make && make install && \
+	rm -rf ${DIR} && \
+	apk del ${APK_ARGS}
 
 # Build libva-intel-driver
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
