@@ -27,6 +27,7 @@ install:
         fi
 
 script:
+  - set -e # Fail immediately
   - docker build -f Dockerfile.${DOCKERFILE} --compress ${DOCKER_CACHE_ARGS} --tag ${IMAGE_NAME}:build .
   - docker run --rm -t ${IMAGE_NAME}:build -buildconf
   - bash runtests.sh
