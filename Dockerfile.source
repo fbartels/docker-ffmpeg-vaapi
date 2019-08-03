@@ -62,30 +62,18 @@ RUN APK_ARGS="musl-dev git make autoconf automake libtool gcc" && \
 	rm -rf ${DIR} && \
 	apk del ${APK_ARGS}
 
-#RUN apk add --no-cache libpciaccess-dev
 # Build libdrm
-RUN APK_ARGS="musl-dev git ninja meson gcc pkgconfig bash linux-headers" && \
-	apk add --no-cache ${APK_ARGS} && \
-	DIR=$(mktemp -d) && cd ${DIR} && \
-	git clone --depth 1 https://gitlab.freedesktop.org/mesa/drm && \
-	cd drm && \
-	meson --prefix=${PREFIX} builddir/ && \
-	ninja -C builddir/ install && \
-	rm -rf ${DIR} && \
-	apk del ${APK_ARGS}
-
-#RUN APK_ARGS="musl-dev git gcc libtool autoconf automake make file" && \
+RUN apk add --no-cache libdrm-dev
+#RUN APK_ARGS="musl-dev git ninja meson gcc pkgconfig bash linux-headers" && \
 #	apk add --no-cache ${APK_ARGS} && \
 #	DIR=$(mktemp -d) && cd ${DIR} && \
 #	git clone --depth 1 https://gitlab.freedesktop.org/mesa/drm && \
-#	cd drm && chmod u+x autogen.sh && \
-#	./autogen.sh && \
-#	./configure && \
-#	make && \
-#	make install && \
+#	cd drm && \
+#	meson --prefix=${PREFIX} builddir/ && \
+#	ninja -C builddir/ install && \
 #	rm -rf ${DIR} && \
 #	apk del ${APK_ARGS}
- 
+
 # Build libva
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
     git clone --depth 1 https://github.com/intel/libva.git && \
