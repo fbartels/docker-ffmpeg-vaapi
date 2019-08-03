@@ -64,15 +64,22 @@ RUN APK_ARGS="musl-dev git make autoconf automake libtool gcc" && \
 
 #RUN apk add --no-cache libpciaccess-dev
 # Build libdrm
-RUN cd ${TMP_DIR} && \
-	git clone --depth 1 https://gitlab.freedesktop.org/mesa/drm
-RUN apk add bash
-RUN apk add linux-headers
+RUN APK_ARGS="musl-dev git gcc libtool autoconf automake make file" && \
+	apk add --no-cache ${APK_ARGS} && \
+	DIR=$(mktemp -d) && cd ${DIR} && \
+	git clone --depth 1 https://gitlab.freedesktop.org/mesa/drm && \
+	cd drm && chmod u+x autogen.sh && \
+	./autogen.sh && \
+	./configure && \
+	make && \
+	make install && \
+	rm -rf ${DIR} && \
+	apk del ${APK_ARGS}
+ 
 RUN cd ${TMP_DIR}/drm && \
 	mkdir -p build && cd build && \
-	meson -Dudev=true && \
-	ninja test && \
-	ninja
+	meson --prefix=${PREFIX} && \
+	ninja install 
 
 # Build libva
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
