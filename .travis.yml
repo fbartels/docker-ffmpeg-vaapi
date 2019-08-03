@@ -5,13 +5,13 @@ services:
 
 env:
   matrix:
-    - OS=centos
-    - OS=alpine
-    - OS=source
+    - DOCKERFILE=centos
+    - DOCKERFILE=alpine
+    - DOCKERFILE=source
   global:
     - IMAGE_NAME=ffmpeg-vaapi
     - DOCKER_CACHE_ARGS=""
-    - CACHE_FROM_IMAGE="${DOCKER_REGISTRY}/${DOCKER_REGISTRY_REPO}/${IMAGE_NAME}:${OS}"
+    - CACHE_FROM_IMAGE="${DOCKER_REGISTRY}/${DOCKER_REGISTRY_REPO}/${IMAGE_NAME}:${DOCKERFILE}"
     - FINAL_IMAGE=${DOCKER_REGISTRY}/${DOCKER_REGISTRY_REPO}/${IMAGE_NAME}
 
 before_install:
@@ -27,20 +27,20 @@ install:
         fi
 
 script:
-  - docker build -f Dockerfile.${OS} --compress ${DOCKER_CACHE_ARGS} --tag ${IMAGE_NAME}:build .
+  - docker build -f Dockerfile.${DOCKERFILE} --compress ${DOCKER_CACHE_ARGS} --tag ${IMAGE_NAME}:build .
   - docker run --rm -t ${IMAGE_NAME}:build -buildconf
   - bash runtests.sh
 
 after_success:
   - if [[ "master" == "${TRAVIS_BRANCH}" ]]; then 
-      export PUSH_IMAGE="${FINAL_IMAGE}:${OS}";
+      export PUSH_IMAGE="${FINAL_IMAGE}:${DOCKERFILE}";
     else
-      export PUSH_IMAGE="${FINAL_IMAGE}:${OS}-${TRAVIS_BRANCH}";
+      export PUSH_IMAGE="${FINAL_IMAGE}:${DOCKERFILE}-${TRAVIS_BRANCH}";
     fi
   - echo "Pushing to ${PUSH_IMAGE}"
   - docker tag ${IMAGE_NAME}:build ${PUSH_IMAGE}
   - docker push ${PUSH_IMAGE}
-  - if [[ "master" == "${TRAVIS_BRANCH}" && "${OS}" == "centos" ]]; then
+  - if [[ "master" == "${TRAVIS_BRANCH}" && "${DOCKERFILE}" == "centos" ]]; then
       docker tag ${IMAGE_NAME}:build ${FINAL_IMAGE}:latest;
       echo "Pushing to ${FINAL_IMAGE}:latest";
       docker push ${FINAL_IMAGE}:latest;
