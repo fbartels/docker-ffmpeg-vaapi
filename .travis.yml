@@ -10,7 +10,6 @@ env:
     - DOCKERFILE=centos
   global:
     - IMAGE_NAME=ffmpeg-vaapi
-    - DOCKER_CACHE_ARGS=""
     - CACHE_FROM_IMAGE="${DOCKER_REGISTRY}/${DOCKER_REGISTRY_REPO}/${IMAGE_NAME}:${DOCKERFILE}"
     - FINAL_IMAGE=${DOCKER_REGISTRY}/${DOCKER_REGISTRY_REPO}/${IMAGE_NAME}
 
@@ -23,7 +22,7 @@ before_install:
 install:
   - if [[ "master" != "${TRAVIS_BRANCH}" ]]; then
                 docker pull ${CACHE_FROM_IMAGE} || true;
-                DOCKER_CACHE_ARGS="--cache-from ${CACHE_FROM_IMAGE}";
+                export DOCKER_CACHE_ARGS="--cache-from ${CACHE_FROM_IMAGE}";
         fi
 
 script:
