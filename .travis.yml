@@ -5,9 +5,9 @@ services:
 
 env:
   matrix:
-    - DOCKERFILE=source
-    - DOCKERFILE=centos
+    - DOCKERFILE=alpine-src
     - DOCKERFILE=alpine
+    - DOCKERFILE=centos
   global:
     - IMAGE_NAME=ffmpeg-vaapi
     - DOCKER_CACHE_ARGS=""
