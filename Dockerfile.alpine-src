@@ -4,33 +4,7 @@ MAINTAINER SuperFlyXXI <superflyxxi@yahoo.com>
 ENTRYPOINT ["ffmpeg"]
 CMD ["--help"]
 
-#ARG PKG_CONFIG_PATH=/usr/lib/pkgconfig
-#ARG SRC_DIR=/ffmpeg
-#ARG NASM_VERSION=2.14.02
-
-#ENV PATH=${PATH}:${SRC_DIR}/bin
-
 WORKDIR /data
-#RUN mkdir -p ${SRC_DIR}/build ${SRC_DIR}/bin
-
-# Enable repos
-#RUN yum install -y --enablerepo=extras epel-release yum-utils && yum clean all
-
-# Upgrade OS
-#RUN yum upgrade -y && yum clean all
-
-# Install libdrm
-#RUN yum install -y libdrm libdrm-devel && yum clean all
-
-# Install compile dependencies
-#RUN yum install -y \
-    # Common Dependencies
-#    automake autoconf bzip2 bzip2-devel cmake freetype-devel gcc gcc-c++ git libtool make mercurial zlib-devel \
-    # libva dependencies
-#    which \
-    # libbluray dependencies
-#    libxml2-devel fontconfig fontconfig-devel ant \
-#    && yum clean all
 
 ARG APK_MAKE_DEPS="musl-dev make autoconf automake libtool"
 ARG PREFIX=/usr
