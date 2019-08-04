@@ -106,7 +106,7 @@ RUN APK_ARGS="${APK_MAKE_DEPS} git bash gcc nasm" && \
 	git clone --depth 1 https://code.videolan.org/videolan/x264.git && \
 	cd x264 && \
 #	PKG_CONFIG_PATH="${SRC_DIR}/build/lib/pkgconfig" ./configure --prefix="${SRC_DIR}/build" --bindir="${SRC_DIR}/bin" --enable-static --disable-cli && \
-	./configure --prefix=${PREFIX} --disable-cli && \
+	./configure --prefix=${PREFIX} --disable-cli --enable-shared && \
 	make && make install && \
 	rm -rf ${DIR} && \
 	apk del ${APK_ARGS}
