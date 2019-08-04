@@ -98,34 +98,16 @@ RUN APK_ARGS="git musl-dev autoconf automake libtool make gcc" && \
 	rm -rf ${DIR} && \
 	apk del ${APK_ARGS}
 
-# Build nasm
-RUN APK_ARGS="musl-dev git automake make autoconf gcc" && \
+# Build x264
+RUN APK_ARGS="musl-dev git make bash gcc nasm" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
-	git clone --depth 1 https://repo.or.cz/nasm.git && \
-	cd nasm && \
-	./autogen.sh && \
-	./configure --prefix=${PREFIX} && \
+	git clone --depth 1 https://code.videolan.org/videolan/x264.git && \
+	cd x264 && \
+	PKG_CONFIG_PATH="${SRC_DIR}/build/lib/pkgconfig" ./configure --prefix="${SRC_DIR}/build" --bindir="${SRC_DIR}/bin" --enable-static --disable-cli && \
 	make && make install && \
 	rm -rf ${DIR} && \
 	apk del ${APK_ARGS}
-
-# Build yasm
-RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    git clone --depth 1  https://github.com/yasm/yasm.git && \
-    cd yasm && \
-    ./autogen.sh && \
-    ./configure --prefix="/usr" --libdir="/usr/lib64" && \
-    make && make install && \
-    rm -rf ${DIR}
-
-# Build x264
-RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    git clone --depth 1 https://code.videolan.org/videolan/x264.git && \
-    cd x264 && \
-    PKG_CONFIG_PATH="${SRC_DIR}/build/lib/pkgconfig" ./configure --prefix="${SRC_DIR}/build" --bindir="${SRC_DIR}/bin" --enable-static && \
-    make && make install && \
-    rm -rf ${DIR}
 
 # Build x265
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
