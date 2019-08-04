@@ -87,13 +87,16 @@ RUN APK_ARGS="git musl-dev gcc autoconf automake libtool make" && \
 	apk del ${APK_ARGS}
 
 # Build libva-intel-driver
-RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    git clone --depth 1 https://github.com/intel/intel-vaapi-driver.git && \
-    cd intel-vaapi-driver && \
-    ./autogen.sh && \
-    ./configure && \
-    make && make install && \
-    rm -rf ${DIR}
+RUN APK_ARGS="git musl-dev autoconf automake libtool make gcc" && \
+	apk add --no-cache ${APK_ARGS} && \
+	DIR=$(mktemp -d) && cd ${DIR} && \
+	git clone --depth 1 https://github.com/intel/intel-vaapi-driver.git && \
+	cd intel-vaapi-driver && \
+	./autogen.sh && \
+	./configure --prefix=${PREFIX} && \
+ 	make && make install && \
+	rm -rf ${DIR} && \
+	apk del ${APK_ARGS}
 
 # Build nasm
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
