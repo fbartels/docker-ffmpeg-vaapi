@@ -145,21 +145,29 @@ RUN APK_ARGS="musl-dev git automake make libtool automake diffutils gcc yasm" &&
 
 # Build libxml2 for use of libbluray
 ARG APK_MAKE_DEPS="musl-dev make autoconf automake libtool"
-#RUN APK_ARGS="git ${APK_MAKE_DEPS} gcc" && \
-#	apk add --no-cache ${APK_ARGS} && \
-#	DIR=$(mktemp -d) && cd ${DIR} && \
-#	git clone --depth 1 https://gitlab.gnome.org/GNOME/libxml2.git && \
-#	cd libxml2 && \
-#	./autogen.sh --prefix=${PREFIX} && \
-#	make && make install && \
-#	rm -rf ${DIR} && \
-#	apk del ${APK_ARGS}
+RUN APK_ARGS="git ${APK_MAKE_DEPS} gcc" && \
+	apk add --no-cache ${APK_ARGS} && \
+	DIR=$(mktemp -d) && cd ${DIR} && \
+	git clone --depth 1 https://gitlab.gnome.org/GNOME/libxml2.git && \
+	cd libxml2 && \
+	./autogen.sh --prefix=${PREFIX} && \
+	make && make install && \
+	rm -rf ${DIR} && \
+	apk del ${APK_ARGS}
 
 # Build Freetype2
-# https://git.savannah.gnu.org/git/freetype/freetype2.git
+RUN APK_ARGS="${APK_MAKE_DEPS} git gcc" && \
+	apk add --no-cache ${APK_ARGS} && \
+	git clone --depth 1 https://git.savannah.gnu.org/git/freetype/freetype2.git && \
+	cd freetype2 && \
+	./autogen.sh && \
+	./configure --prefix=${PREFIX} && \
+	make && make install && \
+	rm -rf ${DIR} && \
+	apk del ${APK_ARGS}
 
 # Build libbluray
-RUN APK_ARGS="${APK_MAKE_DEPS} git gcc libxml2-dev freetype-dev fontconfig-dev apache-ant openjdk8" && \
+RUN APK_ARGS="${APK_MAKE_DEPS} git gcc fontconfig-dev apache-ant openjdk8" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	git clone --depth 1 https://code.videolan.org/videolan/libbluray.git && \
@@ -172,7 +180,7 @@ RUN APK_ARGS="${APK_MAKE_DEPS} git gcc libxml2-dev freetype-dev fontconfig-dev a
 	apk del ${APK_ARGS}
 
 # Build ffmpeg
-RUN APK_ARGS="${APK_MAKE_DEPS} git" && \
+RUN APK_ARGS="${APK_MAKE_DEPS} git gcc nasm yasm" && \
 	apk add --no-cache ${APK_ARGS}
 #RUN DIR=$(mktemp -d) && cd ${DIR} && \
 RUN cd ${TMP_DIR} && \
