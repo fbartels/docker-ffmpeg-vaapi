@@ -121,13 +121,16 @@ RUN APK_ARGS="musl-dev mercurial cmake nasm make g++" && \
 	apk del ${APK_ARGS}
 
 # Build fdk_aac
-RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    git clone --depth 1 https://github.com/mstorsjo/fdk-aac && \
-    cd fdk-aac && \
-    autoreconf -fiv && \
-    ./configure --prefix="${SRC_DIR}/build" --disable-shared && \
-    make && make install && \
-    rm -rf ${DIR}
+RUN APK_ARGS="musl-dev git autoconf make g++ libtool automake" && \
+	apk add --no-cache ${APK_ARGS} && \
+	DIR=$(mktemp -d) && cd ${DIR} && \
+	git clone --depth 1 https://github.com/mstorsjo/fdk-aac && \
+	cd fdk-aac && \
+	autoreconf -fiv && \
+	./configure --prefix="${SRC_DIR}/build" --disable-shared && \
+	make && make install && \
+	rm -rf ${DIR} && \
+	apk del ${APK_ARGS}
 
 # Build libvpx
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
