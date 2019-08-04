@@ -133,12 +133,15 @@ RUN APK_ARGS="musl-dev git autoconf make g++ libtool automake" && \
 	apk del ${APK_ARGS}
 
 # Build libvpx
-RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git && \
-    cd libvpx && \
-    ./configure --prefix="${SRC_DIR}/build" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm && \
-    make && make install && \
-    rm -rf ${DIR}
+RUN APK_ARGS="musl-dev git automake make libtool automake diffutils gcc yasm" && \
+	apk add --no-cache ${APK_ARGS} && \
+	DIR=$(mktemp -d) && cd ${DIR} && \
+	git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git && \
+	cd libvpx && \
+	./configure --prefix="${SRC_DIR}/build" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm && \
+	make && make install && \
+	rm -rf ${DIR} && \
+	apk del ${APK_ARGS}
 
 # Build libbluray
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
