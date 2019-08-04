@@ -155,9 +155,10 @@ RUN APK_ARGS="git ${APK_MAKE_DEPS} gcc" && \
 	rm -rf ${DIR} && \
 	apk del ${APK_ARGS}
 
-# Build Freetype2
+# Build Freetype2 for libbluray
 RUN APK_ARGS="${APK_MAKE_DEPS} git gcc" && \
 	apk add --no-cache ${APK_ARGS} && \
+	DIR=$(mktemp -d) && cd ${DIR} && \
 	git clone --depth 1 https://git.savannah.gnu.org/git/freetype/freetype2.git && \
 	cd freetype2 && \
 	./autogen.sh && \
@@ -166,8 +167,22 @@ RUN APK_ARGS="${APK_MAKE_DEPS} git gcc" && \
 	rm -rf ${DIR} && \
 	apk del ${APK_ARGS}
 
+# Build fontconfig for libbluray
+#RUN APK_ARGS="${APK_MAKE_DEPS} git" && \
+#	apk add --no-cache ${APK_ARGS}
+#RUN cd ${TMP_DIR} && \
+#	git clone --depth 1 https://gitlab.freedesktop.org/fontconfig/fontconfig.git
+#RUN apk add gperf gettext
+#RUN cd ${TMP_DIR} && \
+#	cd fontconfig && \
+#	./autogen.sh --prefix=${PREFIX} && \
+#	make && make install && \
+#	rm -rf ${DIR} && \
+#	apk del ${APK_ARGS}
+RUN apk add --no-cache fontconfig
+
 # Build libbluray
-RUN APK_ARGS="${APK_MAKE_DEPS} git gcc fontconfig-dev apache-ant openjdk8" && \
+RUN APK_ARGS="${APK_MAKE_DEPS} git gcc apache-ant openjdk8" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	git clone --depth 1 https://code.videolan.org/videolan/libbluray.git && \
