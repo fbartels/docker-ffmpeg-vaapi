@@ -110,12 +110,15 @@ RUN APK_ARGS="musl-dev git make bash gcc nasm" && \
 	apk del ${APK_ARGS}
 
 # Build x265
-RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    hg clone https://bitbucket.org/multicoreware/x265 && \
-    cd x265/build/linux && \
-     cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="${SRC_DIR}/build" -DENABLE_SHARED:bool=off ../../source && \
-    make && make install && \
-    rm -rf ${DIR}
+RUN APK_ARGS="musl-dev mercurial cmake nasm make g++" && \
+	apk add --no-cache ${APK_ARGS} && \
+	DIR=$(mktemp -d) && cd ${DIR} && \
+	hg clone https://bitbucket.org/multicoreware/x265 && \
+	cd x265/build/linux && \
+	cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="${SRC_DIR}/build" -DENABLE_SHARED:bool=off ../../source && \
+	make && make install && \
+	rm -rf ${DIR} && \
+	apk del ${APK_ARGS}
 
 # Build fdk_aac
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
