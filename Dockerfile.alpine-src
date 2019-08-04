@@ -32,12 +32,13 @@ WORKDIR /data
 #    libxml2-devel fontconfig fontconfig-devel ant \
 #    && yum clean all
 
+ARG APK_MAKE_DEPS="musl-dev make autoconf automake libtool"
 ARG PREFIX=/usr
 ARG TMP_DIR=/tmp/build
 RUN mkdir -p ${TMP_DIR}
 
 # Build xorgs-macros
-RUN APK_ARGS="gcc git musl-dev ninja meson pkgconf autoconf make automake" && \
+RUN APK_ARGS="${APK_MAKE_DEPS} gcc git" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	git clone --depth 1 https://github.com/freedesktop/xorg-macros.git && \
@@ -50,7 +51,7 @@ RUN APK_ARGS="gcc git musl-dev ninja meson pkgconf autoconf make automake" && \
 	apk del ${APK_ARGS}
 
 # Build PCI-Access
-RUN APK_ARGS="musl-dev git make autoconf automake libtool gcc" && \
+RUN APK_ARGS="${APK_MAKE_DEPS} git gcc" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	git clone --depth 1 https://gitlab.freedesktop.org/xorg/lib/libpciaccess && \
@@ -75,7 +76,7 @@ RUN apk add --no-cache libdrm-dev
 #	apk del ${APK_ARGS}
 
 # Build libva
-RUN APK_ARGS="git musl-dev gcc autoconf automake libtool make" && \
+RUN APK_ARGS="${APK_MAKE_DEPS} git gcc" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	git clone --depth 1 https://github.com/intel/libva.git && \
@@ -87,7 +88,7 @@ RUN APK_ARGS="git musl-dev gcc autoconf automake libtool make" && \
 	apk del ${APK_ARGS}
 
 # Build libva-intel-driver
-RUN APK_ARGS="git musl-dev autoconf automake libtool make gcc" && \
+RUN APK_ARGS="${APK_MAKE_DEPS} git gcc" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	git clone --depth 1 https://github.com/intel/intel-vaapi-driver.git && \
@@ -99,7 +100,7 @@ RUN APK_ARGS="git musl-dev autoconf automake libtool make gcc" && \
 	apk del ${APK_ARGS}
 
 # Build x264
-RUN APK_ARGS="musl-dev git make bash gcc nasm" && \
+RUN APK_ARGS="${APK_MAKE_DEPS} git bash gcc nasm" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	git clone --depth 1 https://code.videolan.org/videolan/x264.git && \
@@ -111,7 +112,7 @@ RUN APK_ARGS="musl-dev git make bash gcc nasm" && \
 	apk del ${APK_ARGS}
 
 # Build x265
-RUN APK_ARGS="musl-dev mercurial cmake nasm make g++" && \
+RUN APK_ARGS="${APK_MAKE_DEPS} mercurial nasm g++" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	hg clone https://bitbucket.org/multicoreware/x265 && \
@@ -123,7 +124,7 @@ RUN APK_ARGS="musl-dev mercurial cmake nasm make g++" && \
 	apk del ${APK_ARGS}
 
 # Build fdk_aac
-RUN APK_ARGS="musl-dev git autoconf make g++ libtool automake" && \
+RUN APK_ARGS="${APK_MAKE_DEPS} git g++" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	git clone --depth 1 https://github.com/mstorsjo/fdk-aac && \
@@ -136,7 +137,7 @@ RUN APK_ARGS="musl-dev git autoconf make g++ libtool automake" && \
 	apk del ${APK_ARGS}
 
 # Build libvpx
-RUN APK_ARGS="musl-dev git automake make libtool automake diffutils gcc yasm" && \
+RUN APK_ARGS="${APK_MAKE_DEPS} git diffutils gcc yasm" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git && \
@@ -148,8 +149,7 @@ RUN APK_ARGS="musl-dev git automake make libtool automake diffutils gcc yasm" &&
 	apk del ${APK_ARGS}
 
 # Build libxml2 for use of libbluray
-ARG APK_MAKE_DEPS="musl-dev make autoconf automake libtool"
-RUN APK_ARGS="git ${APK_MAKE_DEPS} gcc" && \
+RUN APK_ARGS="${APK_MAKE_DEPS} git gcc" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	git clone --depth 1 https://gitlab.gnome.org/GNOME/libxml2.git && \
