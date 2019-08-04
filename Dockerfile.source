@@ -99,13 +99,16 @@ RUN APK_ARGS="git musl-dev autoconf automake libtool make gcc" && \
 	apk del ${APK_ARGS}
 
 # Build nasm
-RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    curl -sL "https://www.nasm.us/pub/nasm/releasebuilds/${NASM_VERSION}/nasm-${NASM_VERSION}.tar.bz2" | \
-    tar -jx --strip-components=1 && \
-    ./autogen.sh && \
-    ./configure --prefix="/usr" --libdir="/usr/lib64" && \
-    make && make install && \
-    rm -rf ${DIR}
+RUN APK_ARGS="musl-dev git automake make autoconf gcc" && \
+	apk add --no-cache ${APK_ARGS} && \
+	DIR=$(mktemp -d) && cd ${DIR} && \
+	git clone --depth 1 https://repo.or.cz/nasm.git && \
+	cd nasm && \
+	./autogen.sh && \
+	./configure --prefix=${PREFIX} && \
+	make && make install && \
+	rm -rf ${DIR} && \
+	apk del ${APK_ARGS}
 
 # Build yasm
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
