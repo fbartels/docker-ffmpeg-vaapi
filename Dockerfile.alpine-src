@@ -182,7 +182,7 @@ RUN APK_ARGS="${APK_MAKE_DEPS} git gcc" && \
 RUN apk add --no-cache fontconfig
 
 # Build libbluray
-RUN APK_ARGS="${APK_MAKE_DEPS} git gcc apache-ant openjdk8" && \
+RUN APK_ARGS="${APK_MAKE_DEPS} git gcc apache-ant openjdk8 fontconfig-dev" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	git clone --depth 1 https://code.videolan.org/videolan/libbluray.git && \
