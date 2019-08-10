@@ -79,7 +79,6 @@ RUN APK_ARGS="${APK_MAKE_DEPS} git bash gcc nasm" && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	git clone --depth 1 https://code.videolan.org/videolan/x264.git && \
 	cd x264 && \
-#	PKG_CONFIG_PATH="${SRC_DIR}/build/lib/pkgconfig" ./configure --prefix="${SRC_DIR}/build" --bindir="${SRC_DIR}/bin" --enable-static --disable-cli && \
 	./configure --prefix=${PREFIX} --disable-cli --enable-shared && \
 	make && make install && \
 	rm -rf ${DIR} && \
@@ -91,7 +90,6 @@ RUN APK_ARGS="${APK_MAKE_DEPS} mercurial nasm g++ cmake" && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	hg clone https://bitbucket.org/multicoreware/x265 && \
 	cd x265/build/linux && \
-#	cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="${SRC_DIR}/build" -DENABLE_SHARED:bool=off ../../source && \
 	cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=${PREFIX} ../../source && \
 	make && make install && \
 	rm -rf ${DIR} && \
@@ -104,7 +102,6 @@ RUN APK_ARGS="${APK_MAKE_DEPS} git g++" && \
 	git clone --depth 1 https://github.com/mstorsjo/fdk-aac && \
 	cd fdk-aac && \
 	autoreconf -fiv && \
-#	./configure --prefix="${SRC_DIR}/build" --disable-shared && \
 	./configure --prefix=${PREFIX} && \
 	make && make install && \
 	rm -rf ${DIR} && \
@@ -116,7 +113,6 @@ RUN APK_ARGS="${APK_MAKE_DEPS} git diffutils gcc yasm" && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
 	git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git && \
 	cd libvpx && \
-#	./configure --prefix="${SRC_DIR}/build" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm && \
 	./configure --prefix=${PREFIX} --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm && \
 	make && make install && \
 	rm -rf ${DIR} && \
@@ -174,33 +170,26 @@ RUN APK_ARGS="${APK_MAKE_DEPS} git gcc apache-ant openjdk8 fontconfig-dev" && \
 
 # Build ffmpeg
 RUN APK_ARGS="${APK_MAKE_DEPS} git gcc nasm yasm" && \
-	apk add --no-cache ${APK_ARGS}
-#RUN DIR=$(mktemp -d) && cd ${DIR} && \
-RUN cd ${TMP_DIR} && \
-    git clone --depth 1 https://git.ffmpeg.org/ffmpeg.git
-RUN cd ${TMP_DIR} && \
-    cd ffmpeg && \
-#    PKG_CONFIG_PATH="${SRC_DIR}/build/lib/pkgconfig" ./configure \
-#        --prefix="${SRC_DIR}/build" \
-    ./configure --prefix=${PREFIX} \
-#        --pkg-config-flags="--static" \
-#        --extra-cflags="-I${SRC_DIR}/build/include" \
-#        --extra-ldflags="-L${SRC_DIR}/build/lib" \
-        --extra-libs=-lpthread \
-        --extra-libs=-lm \
-#        --bindir="${SRC_DIR}/bin" \
-        --enable-small \
-        --enable-gpl \
-        --enable-libx265 \
-        --enable-libx264 \
-        --enable-vaapi \
-        --enable-libbluray \
-        --enable-libfdk_aac --enable-nonfree \
-        --enable-libvpx \
-        --disable-doc \
-        --disable-debug && \
-    make && make install && \
-    make distclean && \
-    hash -r && \
-    rm -rf ${DIR} 
+	apk add --no-cache ${APK_ARGS} && \
+	DIR=$(mktemp -d) && cd ${DIR} && \
+	git clone --depth 1 https://git.ffmpeg.org/ffmpeg.git && \
+	cd ffmpeg && \
+	./configure --prefix=${PREFIX} \
+        	--extra-libs=-lpthread \
+	        --extra-libs=-lm \
+        	--enable-small \
+	        --enable-gpl \
+        	--enable-libx265 \
+	        --enable-libx264 \
+        	--enable-vaapi \
+	        --enable-libbluray \
+        	--enable-libfdk_aac --enable-nonfree \
+	        --enable-libvpx \
+        	--disable-doc \
+	        --disable-debug && \
+	make && make install && \
+	make distclean && \
+	hash -r && \
+	rm -rf ${DIR} && \
+	apk del ${APK_ARGS}
 
