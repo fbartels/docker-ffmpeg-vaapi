@@ -42,7 +42,7 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc" && \
 RUN YUM_ARGS="git ninja meson gcc pkgconfig bash linux-headers" && \
 	yum install -y ${YUM_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
-	git clone --depth 1 https://gitlab.freedesktop.org/mesa/drm && \
+	git clone --depth 1 https://gitlab.freedesktop.org/mesa/drm.git && \
 	cd drm && \
 	meson --prefix=${PREFIX} builddir/ && \
 	ninja -C builddir/ install && \

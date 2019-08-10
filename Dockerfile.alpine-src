@@ -42,7 +42,7 @@ RUN APK_ARGS="${APK_MAKE_DEPS} git gcc" && \
 RUN APK_ARGS="musl-dev git ninja meson gcc pkgconfig bash linux-headers" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
-	git clone --depth 1 https://gitlab.freedesktop.org/mesa/drm && \
+	git clone --depth 1 https://gitlab.freedesktop.org/mesa/drm.git && \
 	cd drm && \
 	meson --prefix=${PREFIX} builddir/ && \
 	ninja -C builddir/ install && \
