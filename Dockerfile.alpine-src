@@ -85,6 +85,7 @@ RUN APK_ARGS="${APK_MAKE_DEPS} git bash gcc nasm" && \
 	apk del ${APK_ARGS}
 
 # Build x265
+RUN apk add --no-cache libstdc++
 RUN APK_ARGS="${APK_MAKE_DEPS} mercurial nasm g++ cmake" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
