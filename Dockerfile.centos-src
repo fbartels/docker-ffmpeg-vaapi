@@ -28,7 +28,7 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} gcc git" && \
 RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc" && \
 	yum install -y ${YUM_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
-	git clone --depth 1 https://gitlab.freedesktop.org/xorg/lib/libpciaccess && \
+	git clone --depth 1 https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git && \
 	cd libpciaccess && \
 	./autogen.sh && \
 	./configure --prefix=${PREFIX} && \

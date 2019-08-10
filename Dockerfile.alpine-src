@@ -28,7 +28,7 @@ RUN APK_ARGS="${APK_MAKE_DEPS} gcc git" && \
 RUN APK_ARGS="${APK_MAKE_DEPS} git gcc" && \
 	apk add --no-cache ${APK_ARGS} && \
 	DIR=$(mktemp -d) && cd ${DIR} && \
-	git clone --depth 1 https://gitlab.freedesktop.org/xorg/lib/libpciaccess && \
+	git clone --depth 1 https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git && \
 	cd libpciaccess && \
 	./autogen.sh && \
 	./configure --prefix=${PREFIX} && \
@@ -38,16 +38,16 @@ RUN APK_ARGS="${APK_MAKE_DEPS} git gcc" && \
 	apk del ${APK_ARGS}
 
 # Build libdrm
-RUN apk add --no-cache libdrm-dev
-#RUN APK_ARGS="musl-dev git ninja meson gcc pkgconfig bash linux-headers" && \
-#	apk add --no-cache ${APK_ARGS} && \
-#	DIR=$(mktemp -d) && cd ${DIR} && \
-#	git clone --depth 1 https://gitlab.freedesktop.org/mesa/drm && \
-#	cd drm && \
-#	meson --prefix=${PREFIX} builddir/ && \
-#	ninja -C builddir/ install && \
-#	rm -rf ${DIR} && \
-#	apk del ${APK_ARGS}
+#RUN apk add --no-cache libdrm-dev
+RUN APK_ARGS="musl-dev git ninja meson gcc pkgconfig bash linux-headers" && \
+	apk add --no-cache ${APK_ARGS} && \
+	DIR=$(mktemp -d) && cd ${DIR} && \
+	git clone --depth 1 https://gitlab.freedesktop.org/mesa/drm && \
+	cd drm && \
+	meson --prefix=${PREFIX} builddir/ && \
+	ninja -C builddir/ install && \
+	rm -rf ${DIR} && \
+	apk del ${APK_ARGS}
 
 # Build libva
 RUN APK_ARGS="${APK_MAKE_DEPS} git gcc" && \
