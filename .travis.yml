@@ -6,7 +6,6 @@ services:
 env:
   matrix:
     - DOCKERFILE=alpine-src
-    - DOCKERFILE=centos-src
     - DOCKERFILE=alpine
     - DOCKERFILE=centos
   global:
