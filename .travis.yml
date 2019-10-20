@@ -15,7 +15,7 @@ env:
 
 before_install:
   - sudo apt-get install -y jq
-  - sudo sed -i "s/\DOCKER_OPTS=\"/DOCKER_OPTS=\"--insecure-registry=${DOCKER_REGISTRY} /g" /etc/default/docker
+  - sudo cat /etc/docker/daemon.json | jq ". + {\"insecure-registries\":[\"${DOCKER_REGISTRY}\"] }" | sudo tee /etc/docker/daemon.json
   - sudo service docker restart
   - echo ${DOCKER_REGISTRY_PASSWORD} | docker login --username ${DOCKER_REGISTRY_USERNAME} --password-stdin ${DOCKER_REGISTRY}
 
