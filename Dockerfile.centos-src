@@ -22,7 +22,7 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} gcc git" && \
 	make && \
 	make install && \
 	rm -rf ${DIR} && \
-	yum remove ${YUM_ARGS} && yum clean all
+	yum remove -y ${YUM_ARGS} && yum clean all
 
 # Build PCI-Access
 RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc" && \
@@ -35,7 +35,7 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc" && \
 	make && \
 	make install && \
 	rm -rf ${DIR} && \
-	yum remove ${YUM_ARGS} && yum clean all
+	yum remove -y ${YUM_ARGS} && yum clean all
 
 # Build libdrm
 #RUN yum install -y libdrm-dev
@@ -47,7 +47,7 @@ RUN YUM_ARGS="musl-dev git ninja meson gcc pkgconfig bash linux-headers" && \
 	meson --prefix=${PREFIX} builddir/ && \
 	ninja -C builddir/ install && \
 	rm -rf ${DIR} && \
-	yum remove ${YUM_ARGS} && yum clean all
+	yum remove -y ${YUM_ARGS} && yum clean all
 
 # Build libva
 RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc" && \
@@ -59,7 +59,7 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc" && \
 	./configure CFLAGS=' -O2' CXXFLAGS=' -O2' --prefix=${PREFIX} && \
 	make && make install && \
 	rm -rf ${DIR} && \
-	yum remove ${YUM_ARGS} && yum clean all
+	yum remove -y ${YUM_ARGS} && yum clean all
 
 # Build libva-intel-driver
 RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc" && \
@@ -71,7 +71,7 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc" && \
 	./configure --prefix=${PREFIX} && \
  	make && make install && \
 	rm -rf ${DIR} && \
-	yum remove ${YUM_ARGS} && yum clean all
+	yum remove -y ${YUM_ARGS} && yum clean all
 
 # Build x264
 RUN YUM_ARGS="${YUM_MAKE_DEPS} git bash gcc nasm" && \
@@ -82,7 +82,7 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} git bash gcc nasm" && \
 	./configure --prefix=${PREFIX} --disable-cli --enable-shared && \
 	make && make install && \
 	rm -rf ${DIR} && \
-	yum remove ${YUM_ARGS} && yum clean all
+	yum remove -y ${YUM_ARGS} && yum clean all
 
 # Build x265
 RUN yum install -y libstdc++
@@ -94,7 +94,7 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} mercurial nasm g++ cmake" && \
 	cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=${PREFIX} ../../source && \
 	make && make install && \
 	rm -rf ${DIR} && \
-	yum remove ${YUM_ARGS} && yum clean all
+	yum remove -y ${YUM_ARGS} && yum clean all
 
 # Build fdk_aac
 RUN YUM_ARGS="${YUM_MAKE_DEPS} git g++" && \
@@ -106,7 +106,7 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} git g++" && \
 	./configure --prefix=${PREFIX} && \
 	make && make install && \
 	rm -rf ${DIR} && \
-	yum remove ${YUM_ARGS} && yum clean all
+	yum remove -y ${YUM_ARGS} && yum clean all
 
 # Build libvpx
 RUN YUM_ARGS="${YUM_MAKE_DEPS} git diffutils gcc yasm" && \
@@ -117,7 +117,7 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} git diffutils gcc yasm" && \
 	./configure --prefix=${PREFIX} --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm && \
 	make && make install && \
 	rm -rf ${DIR} && \
-	yum remove ${YUM_ARGS} && yum clean all
+	yum remove -y ${YUM_ARGS} && yum clean all
 
 # Build libxml2 for use of libbluray
 RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc" && \
@@ -128,7 +128,7 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc" && \
 	./autogen.sh --prefix=${PREFIX} && \
 	make && make install && \
 	rm -rf ${DIR} && \
-	yum remove ${YUM_ARGS} && yum clean all
+	yum remove -y ${YUM_ARGS} && yum clean all
 
 # Build Freetype2 for libbluray
 RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc" && \
@@ -140,7 +140,7 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc" && \
 	./configure --prefix=${PREFIX} && \
 	make && make install && \
 	rm -rf ${DIR} && \
-	yum remove ${YUM_ARGS} && yum clean all
+	yum remove -y ${YUM_ARGS} && yum clean all
 
 # Build fontconfig for libbluray
 #RUN YUM_ARGS="${YUM_MAKE_DEPS} git" && \
@@ -153,7 +153,7 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc" && \
 #	./autogen.sh --prefix=${PREFIX} && \
 #	make && make install && \
 #	rm -rf ${DIR} && \
-#	yum remove ${YUM_ARGS} && yum clean all
+#	yum remove -y ${YUM_ARGS} && yum clean all
 RUN yum install -y fontconfig
 
 # Build libbluray
@@ -167,7 +167,7 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc apache-ant openjdk8 fontconfig-dev" && \
 	./configure --prefix=${PREFIX} && \
 	make && make install && \
 	rm -rf ${DIR} && \
-	yum remove ${YUM_ARGS} && yum clean all
+	yum remove -y ${YUM_ARGS} && yum clean all
 
 # Build ffmpeg
 RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc nasm yasm" && \
@@ -192,5 +192,5 @@ RUN YUM_ARGS="${YUM_MAKE_DEPS} git gcc nasm yasm" && \
 	make distclean && \
 	hash -r && \
 	rm -rf ${DIR} && \
-	yum remove ${YUM_ARGS} && yum clean all
+	yum remove -y ${YUM_ARGS} && yum clean all
 
