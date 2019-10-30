@@ -15,8 +15,10 @@ env:
 
 before_install:
   - sudo apt-get install -y jq
-  - sudo cat /etc/docker/daemon.json | jq ". + {\"insecure-registries\":[\"${DOCKER_REGISTRY}\"] }" | sudo tee /etc/docker/daemon.json
-  - sudo service docker restart
+  - sudo service docker stop
+  - sudo cat /etc/docker/daemon.json | jq ". + {\"insecure-registries\":[\"${DOCKER_REGISTRY}\"] }" > /tmp/docker_daemon.json
+  - sudo cp -v /tmp/docker_daemon.json /etc/docker/daemon.json
+  - sudo service docker start
   - echo ${DOCKER_REGISTRY_PASSWORD} | docker login --username ${DOCKER_REGISTRY_USERNAME} --password-stdin ${DOCKER_REGISTRY}
 
 install:
@@ -26,6 +28,7 @@ install:
         fi
 
 script:
+  - set -e
   - docker build -f Dockerfile.${OS} --compress ${DOCKER_CACHE_ARGS} --tag ${IMAGE_NAME}:build .
   - docker run --rm -t ${IMAGE_NAME}:build -buildconf
   - bash runtests.sh
