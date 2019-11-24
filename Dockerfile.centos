@@ -141,5 +141,9 @@ RUN DIR=$(mktemp -d) && cd ${DIR} && \
     rm -rf ${DIR} 
 
 # Install openshift
+RUN dnf install --nogpgcheck https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
+    dnf install --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-8.noarch.rpm && \
+    dnf config-manager --enable PowerTools && \
+    subscription-manager repos --enable "codeready-builder-for-rhel-8-*-rpms"
 RUN yum install -y openshot
 RUN openshot-render -h
