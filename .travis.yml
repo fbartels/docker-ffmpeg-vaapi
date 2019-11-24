@@ -10,11 +10,13 @@ env:
   global:
     - IMAGE_NAME=ffmpeg-vaapi
     - FINAL_IMAGE=${DOCKER_REGISTRY}/${DOCKER_REGISTRY_REPO}/${IMAGE_NAME}
+    - DOCKER_REGISTRY=docker.io
+    - DOCKER_REGISTRY_REPO=fbartels
 
 before_install:
   - sudo mkdir -p "/etc/docker/certs.d/${DOCKER_REGISTRY}"
   - openssl s_client -showcerts -connect ${DOCKER_REGISTRY} < /dev/null 2> /dev/null | openssl x509 -outform PEM | sudo tee "/etc/docker/certs.d/${DOCKER_REGISTRY}/ca.crt"
-  - echo ${DOCKER_REGISTRY_PASSWORD} | docker login --username ${DOCKER_REGISTRY_USERNAME} --password-stdin ${DOCKER_REGISTRY}
+  #- echo ${DOCKER_REGISTRY_PASSWORD} | docker login --username ${DOCKER_REGISTRY_USERNAME} --password-stdin ${DOCKER_REGISTRY}
 
 install:
   - if [[ ! ${TRAVIS_BRANCH} =~ (master|v.*) ]]; then
