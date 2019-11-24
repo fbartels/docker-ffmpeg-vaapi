@@ -140,3 +140,6 @@ RUN DIR=$(mktemp -d) && cd ${DIR} && \
     hash -r && \
     rm -rf ${DIR} 
 
+# Install openshift
+RUN yum install -y openshot
+RUN openshot-render -h
