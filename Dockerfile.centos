@@ -1,6 +1,6 @@
 # https://trac.ffmpeg.org/wiki/CompilationGuide/Centos
 
-FROM centos
+FROM centos:8
 MAINTAINER SuperFlyXXI <superflyxxi@yahoo.com>
 
 ENTRYPOINT ["ffmpeg"]
@@ -54,8 +54,9 @@ RUN DIR=$(mktemp -d) && cd ${DIR} && \
 
 # Build nasm
 RUN DIR=$(mktemp -d) && cd ${DIR} && \
-    curl -sL "https://www.nasm.us/pub/nasm/releasebuilds/${NASM_VERSION}/nasm-${NASM_VERSION}.tar.bz2" | \
-    tar -jx --strip-components=1 && \
+    curl -L https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.gz | \
+#"https://www.nasm.us/pub/nasm/releasebuilds/${NASM_VERSION}/nasm-${NASM_VERSION}.tar.gz" | \
+    tar -zxv --strip-components=1 && \
     ./autogen.sh && \
     ./configure --prefix="/usr" --libdir="/usr/lib64" && \
     make && make install && \
@@ -141,9 +142,9 @@ RUN DIR=$(mktemp -d) && cd ${DIR} && \
     rm -rf ${DIR} 
 
 # Install openshift
-RUN dnf install --nogpgcheck https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
-    dnf install --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-8.noarch.rpm && \
-    dnf config-manager --enable PowerTools && \
-    subscription-manager repos --enable "codeready-builder-for-rhel-8-*-rpms"
-RUN yum install -y openshot
-RUN openshot-render -h
+#RUN dnf -y install --nogpgcheck https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
+#    dnf -y install --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm 
+#https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-8.noarch.rpm && \
+#    dnf config-manager --enable PowerTools
+#RUN dnf -y install openshot
+#RUN openshot-render -h
